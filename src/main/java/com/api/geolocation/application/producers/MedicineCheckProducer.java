@@ -1,4 +1,4 @@
-package com.api.geolocation.producers;
+package com.api.geolocation.application.producers;
 
 import com.api.geolocation.config.RabbitMQConfig;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

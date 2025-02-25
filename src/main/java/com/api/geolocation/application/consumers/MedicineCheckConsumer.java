@@ -1,4 +1,4 @@
-package com.api.geolocation.consumers;
+package com.api.geolocation.application.consumers;
 
 import com.api.geolocation.config.RabbitMQConfig;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
