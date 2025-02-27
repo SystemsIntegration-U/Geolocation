@@ -2,13 +2,13 @@ package com.api.geolocation.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.locationtech.jts.geom.Point;
 
-import java.awt.Point;
 import java.util.UUID;
 
 @Entity
 @Data
-@Table(name = "Branch")
+@Table(name = "branch")
 public class Branch {
 
     @Id

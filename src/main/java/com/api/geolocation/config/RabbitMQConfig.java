@@ -9,7 +9,7 @@ public class RabbitMQConfig {
 
     public static final String QUEUE_COORDINATES = "coordinatesQueue";
     public static final String QUEUE_MEDICINE_CHECK = "medicineCheckQueue";
-    public static final String EXCHANGE = "";
+    public static final String EXCHANGE = "EXCHANGE";
 
     @Bean
     public Queue coordinatesQueue() {
