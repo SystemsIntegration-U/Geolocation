@@ -8,10 +8,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface IBranchRepository extends JpaRepository<Branch, UUID> {
     @Query("SELECT b FROM Branch b WHERE b.active = true ORDER BY ST_DistanceSphere(b.coordinates, :location) ASC")
     List<Branch> findNearestBranches(@Param("location") Point location);
+
+    Optional<Branch> findByCoordinates(Point coordinates);
 }

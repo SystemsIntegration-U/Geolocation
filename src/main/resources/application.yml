@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: geolocation
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/geo_db
+    username: admin
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: password

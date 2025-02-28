@@ -1,19 +1,20 @@
-package com.api.geolocation.application.producers;
+package com.api.geolocation.presentation.producers;
 
-import com.api.geolocation.config.RabbitMQConfig;
+import lombok.AllArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstantHandler.TOPIC_EXCHANGE;
+
 @Service
+@AllArgsConstructor
 public class CoordinatesProducer {
 
-    @Autowired
     private RabbitTemplate rabbitTemplate;
 
     public String sendCoordinates(double latitude, double longitude, String medicineId) {
         String message = latitude + "," + longitude + "," + medicineId;
-        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE, "route.coordinates", message);
+        rabbitTemplate.convertAndSend(TOPIC_EXCHANGE, "route.coordinates", message);
         return "Coordinates sent: " + message;
     }
 }
