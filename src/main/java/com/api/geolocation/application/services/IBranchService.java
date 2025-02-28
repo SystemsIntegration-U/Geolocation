@@ -1,11 +1,10 @@
-package com.api.geolocation.presentation.services;
+package com.api.geolocation.application.services;
 
-import com.api.geolocation.domain.Branch;
+import com.api.geolocation.application.transaction.BranchDTO;
 import java.util.List;
-import java.util.UUID;
 
 public interface IBranchService {
-    void subscribe(Branch branch);
-    void unsubscribe(UUID branchId);
-    List<Branch> findNearestBranches(double latitude, double longitude);
+    void subscribe(BranchDTO branch);
+    void unsubscribe(BranchDTO branch);
+    List<BranchDTO> findNearestBranches(double latitude, double longitude);
 }

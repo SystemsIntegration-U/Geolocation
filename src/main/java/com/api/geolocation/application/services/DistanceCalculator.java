@@ -1,4 +1,4 @@
-package com.api.geolocation;
+package com.api.geolocation.application.services;
 
 public class DistanceCalculator {
     private static final double RADIO_TIERRA_KM = 6371.0;

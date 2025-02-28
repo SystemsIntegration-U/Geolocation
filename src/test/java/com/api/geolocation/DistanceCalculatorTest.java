@@ -1,5 +1,6 @@
 package com.api.geolocation;
 
+import com.api.geolocation.application.services.DistanceCalculator;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

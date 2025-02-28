@@ -1,23 +1,24 @@
 package com.api.geolocation;
 
-import com.api.geolocation.domain.Branch;
-import com.api.geolocation.infrastructure.repository.IBranchRepository;
-import com.api.geolocation.presentation.services.BranchService;
+import com.api.geolocation.application.services.BranchService;
+import com.api.geolocation.application.transaction.BranchDTO;
+import com.api.geolocation.application.transaction.LocationDTO;
+import com.api.geolocation.domain.entities.Branch;
+import com.api.geolocation.domain.repository.IBranchRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.PrecisionModel;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,73 +30,93 @@ class BranchServiceTest {
     @Mock
     private IBranchRepository branchRepository;
 
+    @Mock
+    private ModelMapper modelMapper;
+
+    @Mock
+    private GeometryFactory geometryFactory;
+
     @InjectMocks
     private BranchService branchService;
 
-    private GeometryFactory geometryFactory;
+    private BranchDTO activeBranchDTO;
+    private BranchDTO inactiveBranchDTO;
     private Branch activeBranch;
     private Branch inactiveBranch;
+    private Point mockPoint;
 
     @BeforeEach
     void setUp() {
-        geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+        activeBranchDTO = new BranchDTO(new LocationDTO(-99.1332, 19.4326));
+        inactiveBranchDTO = new BranchDTO(new LocationDTO(-58.3816, -34.6037));
+
+        mockPoint = mock(Point.class);
 
         activeBranch = new Branch();
-        activeBranch.setId(UUID.randomUUID());
-        activeBranch.setCoordinates(geometryFactory.createPoint(new Coordinate(-99.1332, 19.4326)));
+        activeBranch.setCoordinates(mockPoint);
         activeBranch.setActive(true);
 
         inactiveBranch = new Branch();
-        inactiveBranch.setId(UUID.randomUUID());
-        inactiveBranch.setCoordinates(geometryFactory.createPoint(new Coordinate(-58.3816, -34.6037)));
+        inactiveBranch.setCoordinates(mockPoint);
         inactiveBranch.setActive(false);
     }
 
     @Test
     void testSubscribe() {
+        when(modelMapper.map(activeBranchDTO, Branch.class)).thenReturn(activeBranch);
         when(branchRepository.save(any(Branch.class))).thenReturn(activeBranch);
 
-        branchService.subscribe(activeBranch);
+        branchService.subscribe(activeBranchDTO);
 
-        verify(branchRepository, times(1)).save(activeBranch);
+        verify(modelMapper, times(1)).map(activeBranchDTO, Branch.class);
+        verify(branchRepository, times(1)).save(any(Branch.class));
     }
 
     @Test
     void testUnsubscribe() {
-        UUID branchId = activeBranch.getId();
-        when(branchRepository.findById(branchId)).thenReturn(Optional.of(activeBranch));
+        when(modelMapper.map(activeBranchDTO, Branch.class)).thenReturn(activeBranch);
+        when(branchRepository.findByCoordinates(any(Point.class))).thenReturn(Optional.of(activeBranch));
 
-        branchService.unsubscribe(branchId);
+        branchService.unsubscribe(activeBranchDTO);
 
-        assertFalse(activeBranch.isActive());
-        verify(branchRepository, times(1)).save(activeBranch);
+        verify(modelMapper, times(1)).map(activeBranchDTO, Branch.class);
+        verify(branchRepository, times(1)).findByCoordinates(any(Point.class));
+        verify(branchRepository, times(1)).save(any(Branch.class));
     }
 
     @Test
     void testFindNearestBranches() {
-        Point userLocation = geometryFactory.createPoint(new Coordinate(-99.1332, 19.4326));
+        List<Branch> branchEntities = Arrays.asList(activeBranch, inactiveBranch);
+        List<BranchDTO> expectedDTOs = Arrays.asList(activeBranchDTO, inactiveBranchDTO);
 
-        when(branchRepository.findNearestBranches(any(Point.class)))
-                .thenReturn(Arrays.asList(activeBranch, inactiveBranch));
+        when(geometryFactory.createPoint(any(Coordinate.class))).thenReturn(mockPoint);
+        when(branchRepository.findNearestBranches(any(Point.class))).thenReturn(branchEntities);
+        when(modelMapper.map(activeBranch, BranchDTO.class)).thenReturn(activeBranchDTO);
+        when(modelMapper.map(inactiveBranch, BranchDTO.class)).thenReturn(inactiveBranchDTO);
 
-        List<Branch> nearestBranches = branchService.findNearestBranches(19.4326, -99.1332);
+        List<BranchDTO> nearestBranches = branchService.findNearestBranches(19.4326, -99.1332);
 
         assertNotNull(nearestBranches);
         assertEquals(2, nearestBranches.size());
-        assertTrue(nearestBranches.contains(activeBranch));
+        assertTrue(nearestBranches.contains(activeBranchDTO));
 
+        verify(geometryFactory, times(1)).createPoint(any(Coordinate.class));
         verify(branchRepository, times(1)).findNearestBranches(any(Point.class));
+        verify(modelMapper, times(2)).map(any(Branch.class), eq(BranchDTO.class));
     }
 
     @Test
     void testFindNearestBranches_EmptyResult() {
+        when(geometryFactory.createPoint(any(Coordinate.class))).thenReturn(mockPoint);
         when(branchRepository.findNearestBranches(any(Point.class))).thenReturn(List.of());
 
-        List<Branch> nearestBranches = branchService.findNearestBranches(19.4326, -99.1332);
+        List<BranchDTO> nearestBranches = branchService.findNearestBranches(19.4326, -99.1332);
 
         assertNotNull(nearestBranches);
         assertTrue(nearestBranches.isEmpty());
 
+        verify(geometryFactory, times(1)).createPoint(any(Coordinate.class));
         verify(branchRepository, times(1)).findNearestBranches(any(Point.class));
+        verify(modelMapper, never()).map(any(Branch.class), eq(BranchDTO.class));
     }
 }
