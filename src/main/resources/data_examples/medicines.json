@@ -1,0 +1,14 @@
+[
+  {
+    "productDetails": {
+      "id": "a71c6626-82ae-43c0-9194-28fe85905665",
+      "name": "Penicillin",
+      "stock": 6
+    },
+    "originCoordinates": {
+      "latitude": -17.385385116491832,
+      "longitude": -66.15774909625948
+    },
+    "range": 1000.12
+  }
+]
