@@ -1,4 +1,4 @@
-package com.api.geolocation.domain;
+package com.api.geolocation.domain.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

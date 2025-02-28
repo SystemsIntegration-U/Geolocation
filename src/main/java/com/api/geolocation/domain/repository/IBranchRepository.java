@@ -1,6 +1,6 @@
-package com.api.geolocation.infrastructure.repository;
+package com.api.geolocation.domain.repository;
 
-import com.api.geolocation.domain.Branch;
+import com.api.geolocation.domain.entities.Branch;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
