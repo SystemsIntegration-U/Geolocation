@@ -13,10 +13,25 @@ spring:
       ddl-auto: create-drop
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
 
   rabbitmq:
     host: localhost
     port: 5672
     username: admin
     password: password
+    listener:
+      simple:
+        default-requeue-rejected: false
+        retry:
+          enabled: true
+          initial-interval: 1000
+          max-attempts: 3
+          multiplier: 1
+          max-interval: 10000
+
+logging:
+  level:
+    org:
+      springframework:
+        amqp: debug
