@@ -1,21 +1,38 @@
 package com.api.geolocation.presentation.consumers;
 
 import com.api.geolocation.application.services.IBranchService;
+import com.api.geolocation.application.transaction.BranchDTO;
 import com.api.geolocation.application.transaction.RequiredMedicineDTO;
+import com.api.geolocation.presentation.producers.LocationProducer;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstantHandler.QUEUE_MEDICINE_CHECK;
+import java.util.List;
 
-@Service
+import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstants.MEDICINE_SEARCH_QUEUE;
+
+@Component
 @AllArgsConstructor
-public class MedicineConsumer {
+@Slf4j
+public class LocationConsumer {
 
     private IBranchService branchService;
+    private LocationProducer locationProducer;
 
-    @RabbitListener(queues = QUEUE_MEDICINE_CHECK)
-    public boolean searchForMedicine(RequiredMedicineDTO requiredMedicineDTO) {
-        branchService.findNearestBranches()
+    @RabbitListener(queues = MEDICINE_SEARCH_QUEUE)
+    public void searchForMedicine(RequiredMedicineDTO requiredMedicineDTO) {
+        try {
+            List<BranchDTO> nearestBranches = branchService.findNearestBranches(
+                    requiredMedicineDTO.getOriginCoordinates().getLatitude(),
+                    requiredMedicineDTO.getOriginCoordinates().getLongitude()
+            );
+            locationProducer.sendBranchesWithMedicine(nearestBranches, requiredMedicineDTO);
+            log.info("searchForMedicine: ({}, {})", requiredMedicineDTO.getOriginCoordinates().getLatitude(), requiredMedicineDTO.getOriginCoordinates().getLongitude());
+            log.info("searchForMedicine: ({} - stock: {})", requiredMedicineDTO.getProductDetails().getId(), requiredMedicineDTO.getProductDetails().getStock());
+        } catch (Exception exception) {
+            log.warn(exception.getMessage());
+        }
     }
 }
