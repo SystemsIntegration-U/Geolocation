@@ -2,13 +2,25 @@
   {
     "productDetails": {
       "id": "a71c6626-82ae-43c0-9194-28fe85905665",
-      "name": "Penicillin",
+      "name": "Ibuprofen",
       "stock": 6
     },
     "originCoordinates": {
-      "latitude": -17.385385116491832,
-      "longitude": -66.15774909625948
+      "latitude": -17.384359627495332,
+      "longitude": -66.1513703550875
     },
-    "range": 1000.12
+    "range": 1000.0
+  },
+  {
+    "productDetails": {
+      "id": "a71c6626-82ae-43c0-9194-28fe85905665",
+      "name": "Paracetamol",
+      "stock": 3
+    },
+    "originCoordinates": {
+      "latitude": -17.364362850882355,
+      "longitude": -66.17861907295976
+    },
+    "range": 500.0
   }
 ]
