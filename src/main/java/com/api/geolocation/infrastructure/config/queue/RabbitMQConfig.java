@@ -2,7 +2,7 @@ package com.api.geolocation.infrastructure.config.queue;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -11,28 +11,36 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstants.BRANCHES_WITH_MEDICINE_KEY;
+import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstants.BRANCHES_WITH_MEDICINE_EXCHANGE;
 import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstants.BRANCHES_WITH_MEDICINE_QUEUE;
-import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstants.BRANCH_EXCHANGE;
-import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstants.BRANCH_SUBSCRIPTION_KEY;
+import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstants.BRANCH_SUBSCRIPTION_EXCHANGE;
 import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstants.BRANCH_SUBSCRIPTION_QUEUE;
-import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstants.BRANCH_UNSUBSCRIPTION_KEY;
+import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstants.BRANCH_UNSUBSCRIPTION_EXCHANGE;
 import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstants.BRANCH_UNSUBSCRIPTION_QUEUE;
-import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstants.MEDICINE_EXCHANGE;
-import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstants.MEDICINE_SEARCH_KEY;
+import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstants.MEDICINE_SEARCH_EXCHANGE;
 import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstants.MEDICINE_SEARCH_QUEUE;
 
 @Configuration
 public class RabbitMQConfig {
 
     @Bean
-    public DirectExchange branchExchange() {
-        return new DirectExchange(BRANCH_EXCHANGE);
+    public FanoutExchange branchSubscriptionExchange() {
+        return new FanoutExchange(BRANCH_SUBSCRIPTION_EXCHANGE);
     }
 
     @Bean
-    public DirectExchange medicineExchange() {
-        return new DirectExchange(MEDICINE_EXCHANGE);
+    public FanoutExchange branchUnsubscriptionExchange() {
+        return new FanoutExchange(BRANCH_UNSUBSCRIPTION_EXCHANGE);
+    }
+
+    @Bean
+    public FanoutExchange medicineSearchExchange() {
+        return new FanoutExchange(MEDICINE_SEARCH_EXCHANGE);
+    }
+
+    @Bean
+    public FanoutExchange branchesWithMedicineExchange() {
+        return new FanoutExchange(BRANCHES_WITH_MEDICINE_EXCHANGE);
     }
 
     @Bean
@@ -56,31 +64,23 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Binding branchSubscriptionBinding(Queue branchSubscriptionQueue, DirectExchange branchExchange) {
-        return BindingBuilder.bind(branchSubscriptionQueue)
-                .to(branchExchange)
-                .with(BRANCH_SUBSCRIPTION_KEY);
+    public Binding branchSubscriptionBinding(Queue branchSubscriptionQueue, FanoutExchange branchSubscriptionExchange) {
+        return BindingBuilder.bind(branchSubscriptionQueue).to(branchSubscriptionExchange);
     }
 
     @Bean
-    public Binding branchUnsubscriptionBinding(Queue branchUnsubscriptionQueue, DirectExchange branchExchange) {
-        return BindingBuilder.bind(branchUnsubscriptionQueue)
-                .to(branchExchange)
-                .with(BRANCH_UNSUBSCRIPTION_KEY);
+    public Binding branchUnsubscriptionBinding(Queue branchUnsubscriptionQueue, FanoutExchange branchUnsubscriptionExchange) {
+        return BindingBuilder.bind(branchUnsubscriptionQueue).to(branchUnsubscriptionExchange);
     }
 
     @Bean
-    public Binding medicineSearchBinding(Queue medicineSearchQueue, DirectExchange medicineExchange) {
-        return BindingBuilder.bind(medicineSearchQueue)
-                .to(medicineExchange)
-                .with(MEDICINE_SEARCH_KEY);
+    public Binding medicineSearchBinding(Queue medicineSearchQueue, FanoutExchange medicineSearchExchange) {
+        return BindingBuilder.bind(medicineSearchQueue).to(medicineSearchExchange);
     }
 
     @Bean
-    public Binding branchesWithMedicineBinding(Queue branchesWithMedicineQueue, DirectExchange medicineExchange) {
-        return BindingBuilder.bind(branchesWithMedicineQueue)
-                .to(medicineExchange)
-                .with(BRANCHES_WITH_MEDICINE_KEY);
+    public Binding branchesWithMedicineBinding(Queue branchesWithMedicineQueue, FanoutExchange branchesWithMedicineExchange) {
+        return BindingBuilder.bind(branchesWithMedicineQueue).to(branchesWithMedicineExchange);
     }
 
     @Bean

@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstants.BRANCHES_WITH_MEDICINE_KEY;
-import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstants.MEDICINE_EXCHANGE;
+import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstants.BRANCHES_WITH_MEDICINE_EXCHANGE;
+import static com.api.geolocation.infrastructure.config.queue.RabbitMQConstants.FANOUT_KEY;
 
 @Component
 @AllArgsConstructor
@@ -36,8 +36,8 @@ public class LocationProducer {
             );
 
             rabbitTemplate.convertAndSend(
-                    MEDICINE_EXCHANGE,
-                    BRANCHES_WITH_MEDICINE_KEY,
+                    BRANCHES_WITH_MEDICINE_EXCHANGE,
+                    FANOUT_KEY,
                     branchesWithMedicineDTO
             );
             log.info("sendBranchesWithMedicine: (arrayLength: {}, medicine: {}, medicineStock: {})",
