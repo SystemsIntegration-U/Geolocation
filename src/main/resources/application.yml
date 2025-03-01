@@ -16,10 +16,13 @@ spring:
         dialect: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
 
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: admin
-    password: password
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:admin}
+    password: ${RABBITMQ_PASSWORD:password}
+    ssl:
+      enabled: ${SSL_ENABLED:false}
+      validate-server-certificate: ${SSL_VALIDATE_CERTIFICATE:false}
     listener:
       simple:
         default-requeue-rejected: false
