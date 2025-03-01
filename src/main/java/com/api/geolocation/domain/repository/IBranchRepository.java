@@ -13,8 +13,25 @@ import java.util.UUID;
 
 @Repository
 public interface IBranchRepository extends JpaRepository<Branch, UUID> {
-    @Query("SELECT b FROM Branch b WHERE b.active = true ORDER BY ST_DistanceSphere(b.coordinates, :location) ASC")
-    List<Branch> findNearestBranches(@Param("location") Point location);
+    @Query(value = """
+        SELECT * 
+        FROM branch 
+        WHERE active = true 
+          AND ST_DWithin(
+              coordinates, 
+              ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)::geography, 
+              :range
+          )
+        ORDER BY ST_Distance(
+            coordinates, 
+            ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)::geography
+        ) ASC
+        """, nativeQuery = true)
+    List<Branch> findNearestBranchesWithinRange(
+            @Param("latitude") double latitude,
+            @Param("longitude") double longitude,
+            @Param("range") double range
+    );
 
     Optional<Branch> findByCoordinates(Point coordinates);
 }

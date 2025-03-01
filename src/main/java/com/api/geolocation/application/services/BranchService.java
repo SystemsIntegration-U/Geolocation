@@ -5,8 +5,6 @@ import com.api.geolocation.domain.entities.Branch;
 import com.api.geolocation.domain.repository.IBranchRepository;
 import lombok.AllArgsConstructor;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.Coordinate;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -37,12 +35,10 @@ public class BranchService implements IBranchService {
     }
 
     @Override
-    public List<BranchDTO> findNearestBranches(double latitude, double longitude) {
-        Point location = geometryFactory.createPoint(new Coordinate(longitude, latitude));
-        List<Branch> branches = branchRepository.findNearestBranches(location);
+    public List<BranchDTO> findNearestBranches(double latitude, double longitude, double range) {
+        List<Branch> branches = branchRepository.findNearestBranchesWithinRange(latitude, longitude, range);
 
-        return branches.subList(0, Math.min(3, branches.size()))
-                .stream()
+        return branches.stream()
                 .map(branch -> modelMapper.map(branch, BranchDTO.class))
                 .toList();
     }

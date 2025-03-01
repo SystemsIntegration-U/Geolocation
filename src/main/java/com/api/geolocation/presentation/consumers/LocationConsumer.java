@@ -26,7 +26,8 @@ public class LocationConsumer {
         try {
             List<BranchDTO> nearestBranches = branchService.findNearestBranches(
                     requiredMedicineDTO.getOriginCoordinates().getLatitude(),
-                    requiredMedicineDTO.getOriginCoordinates().getLongitude()
+                    requiredMedicineDTO.getOriginCoordinates().getLongitude(),
+                    requiredMedicineDTO.getRange()
             );
             locationProducer.sendBranchesWithMedicine(nearestBranches, requiredMedicineDTO);
             log.info("searchForMedicine: ({}, {})", requiredMedicineDTO.getOriginCoordinates().getLatitude(), requiredMedicineDTO.getOriginCoordinates().getLongitude());
